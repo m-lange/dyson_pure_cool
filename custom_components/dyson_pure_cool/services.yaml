@@ -1,0 +1,22 @@
+set_oscillate:
+  description: Set the angle of the oscillation of the selected fan(s).
+  fields:
+    entity_id:
+      description: String or list of strings that define the entity ID(s) of fan device(s) to control.
+      example: "fan.dyson_pure_cool"
+    osal:
+      description: The lower boundary of the oscillation (between 5 and 355)
+      example: 5
+    osau:
+      description: The upper boundary of the oscillation (between 5 and 355)
+      example: 355
+
+set_sleep_timer:
+  description: Set the sleep timer of the selected fan(s).
+  fields:
+    entity_id:
+      description: String or list of strings that define the entity ID(s) of fan device(s) to control.
+      example: "fan.dyson_pure_cool"
+    sltm:
+      description: The time in minutes, 0 to disable.
+      example: 5
