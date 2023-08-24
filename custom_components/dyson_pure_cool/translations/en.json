@@ -1,0 +1,33 @@
+{
+    "config": {
+        "flow_title": "Dyson Pure Cool ({serial})",
+        "step": {
+            "user": {
+                "title": "Dyson Pure Cool",
+                "data": {
+                    "serial": "Serial",
+                    "credential": "Credential",
+                    "device_type": "Device Type",
+                    "host": "Host"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_auth": "Invalid authentication",
+            "unknown": "Unexpected error"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "rhtm": "Continuous monitoring"
+                }
+            }
+        }
+    }
+}
