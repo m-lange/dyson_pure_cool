@@ -4,9 +4,9 @@
   "config_flow": true,
   "codeowners": [],
   "dependencies": ["zeroconf"],
-  "documentation": "https://www.home-assistant.io/integrations/dyson_pure_cool",
+  "documentation": "https://github.com/m-lange/dyson_pure_cool",
   "iot_class": "local_polling",
   "requirements": ["paho-mqtt"],
   "zeroconf": ["_dyson_mqtt._tcp.local."],
-  "version": "0.3.0"
+  "version": "0.6.0"
 }
