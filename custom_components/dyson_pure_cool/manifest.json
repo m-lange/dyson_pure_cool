@@ -1,12 +1,12 @@
 {
   "domain": "dyson_pure_cool",
   "name": "Dyson Pure Cool",
-  "codeowners": [],
+  "codeowners": ["@m-lange"],
   "config_flow": true,
   "dependencies": ["zeroconf"],
   "documentation": "https://github.com/m-lange/dyson_pure_cool",
-  "iot_class": "local_polling",
   "requirements": ["paho-mqtt"],
   "zeroconf": ["_dyson_mqtt._tcp.local."],
   "version": "0.6.0"
+  "iot_class": "local_polling",
 }
