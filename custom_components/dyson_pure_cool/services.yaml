@@ -6,10 +6,10 @@ set_oscillate:
       description: String or list of strings that define the entity ID(s) of fan device(s) to control.
       example: "fan.dyson_pure_cool"
     osal:
-      description: The lower boundary of the oscillation (between 5 and 355)
+      description: The lower boundary of the oscillation (between 5 and 355).
       example: 5
     osau:
-      description: The upper boundary of the oscillation (between 5 and 355)
+      description: The upper boundary of the oscillation (between 5 and 355).
       example: 355
 
 set_sleep_timer:
