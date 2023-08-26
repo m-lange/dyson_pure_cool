@@ -156,7 +156,7 @@ class DysonEntity(CoordinatorEntity, Entity):
 
 
     @property
-    def device_info(self) -> DeviceInfo:
+    def device_info(self) -> dict:
         """Return device specific attributes."""
         return {
             "identifiers": {(DOMAIN, self._device.serial)},
