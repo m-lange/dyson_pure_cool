@@ -14,9 +14,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 
 from homeassistant.const import (
-    TEMP_CELSIUS,
     PERCENTAGE,
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
+    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    UnitOfTemperature,
 )
 
 from . import DysonEntity
@@ -26,12 +26,13 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 
+
 SENSOR_TYPES = [
     { 
         "id": "temperature",
         "name": "Temperature",
         "device_class": SensorDeviceClass.TEMPERATURE,
-        "native_unit_of_measurement": TEMP_CELSIUS,
+        "native_unit_of_measurement": UnitOfTemperature.CELSIUS,
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:thermometer",
         "suggested_display_precision": 1
@@ -91,13 +92,6 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "icon": "mdi:alpha-c-box-outline"
-    },
-    {  
-        "id": "aqi",
-        "name": "Air Quality Index",
-        "device_class": SensorDeviceClass.AQI,
-        "state_class": SensorStateClass.MEASUREMENT,
-        "icon": "mdi:alpha-a-box-outline"
     }
 
 ]
@@ -140,6 +134,5 @@ class DysonSensorEntity(SensorEntity, DysonEntity):
         if self._id == "noxl": return self._device.nox
         if self._id == "hflr": return self._device.hepa_filter_life
         if self._id == "cflr": return self._device.carbon_filter_life
-        if self._id == "aqi": return 3
 
         return None

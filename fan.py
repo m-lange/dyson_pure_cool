@@ -9,12 +9,10 @@ from typing import Any, Optional
 import voluptuous as vol
 
 from homeassistant.components.fan import (
-    SUPPORT_DIRECTION,
-    SUPPORT_OSCILLATE,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_SET_SPEED,
     FanEntity,
+    FanEntityFeature,
 )
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -110,7 +108,7 @@ class DysonFanEntity(FanEntity, DysonEntity):
     @property
     def supported_features(self) -> int:
         """Flag supported features"""
-        return SUPPORT_DIRECTION | SUPPORT_OSCILLATE | SUPPORT_PRESET_MODE | SUPPORT_SET_SPEED
+        return FanEntityFeature.DIRECTION | FanEntityFeature.OSCILLATE | FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
     
 
     @property
