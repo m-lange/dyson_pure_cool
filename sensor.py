@@ -5,30 +5,32 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.core import HomeAssistant
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.entity import EntityCategory
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-
-
 from homeassistant.const import (
-    PERCENTAGE,
     CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    PERCENTAGE,
     UnitOfTemperature,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from . import DysonEntity
-from .dyson import DysonPureCool
 from .const import DOMAIN
+from .dyson import DysonPureCool
 
 _LOGGER = logging.getLogger(__name__)
 
 
 
 SENSOR_TYPES = [
-    { 
+    {
         "id": "temperature",
         "name": "Temperature",
         "device_class": SensorDeviceClass.TEMPERATURE,
@@ -37,7 +39,7 @@ SENSOR_TYPES = [
         "icon": "mdi:thermometer",
         "suggested_display_precision": 1
     },
-    { 
+    {
         "id": "humidity",
         "name": "Humidity",
         "device_class": SensorDeviceClass.HUMIDITY,
@@ -45,7 +47,7 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:water-percent"
     },
-    {  
+    {
         "id": "pm25",
         "name": "Particulate matter (PM2.5)",
         "device_class": SensorDeviceClass.PM25,
@@ -53,7 +55,7 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:blur-radial"
     },
-    {  
+    {
         "id": "pm10",
         "name": "Particulate matter (PM10)",
         "device_class": SensorDeviceClass.PM10,
@@ -61,7 +63,7 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:blur-radial"
     },
-    {  
+    {
         "id": "va10",
         "name": "Volatile organic compounds",
         "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
@@ -69,7 +71,7 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:molecule"
     },
-    {  
+    {
         "id": "noxl",
         "name": "Nitrogen dioxide and other oxidising gases",
         "device_class": SensorDeviceClass.NITROGEN_DIOXIDE,
@@ -77,7 +79,7 @@ SENSOR_TYPES = [
         "state_class": SensorStateClass.MEASUREMENT,
         "icon": "mdi:molecule"
     },
-    {  
+    {
         "id": "hflr",
         "name": "HEPA filter life",
         "native_unit_of_measurement": PERCENTAGE,
@@ -85,7 +87,7 @@ SENSOR_TYPES = [
         "entity_category": EntityCategory.DIAGNOSTIC,
         "icon": "mdi:alpha-h-box-outline"
     },
-    {  
+    {
         "id": "cflr",
         "name": "Carbon filter life",
         "native_unit_of_measurement": PERCENTAGE,
@@ -95,11 +97,11 @@ SENSOR_TYPES = [
     }
 
 ]
-    
+
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback,) -> None:
-    """Set up Dyson Pure Cool sensors from a config entry"""
+    """Set up Dyson Pure Cool sensors from a config entry."""
 
     device = hass.data[DOMAIN][config_entry.entry_id]
     coordinator = hass.data[DOMAIN][f"{config_entry.entry_id}_coordinator"]
@@ -111,7 +113,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, asyn
 
 class DysonSensorEntity(SensorEntity, DysonEntity):
     """Representation of a dyson sensor entity."""
-    
+
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool, description: dict[str, Any]):
         super().__init__(coordinator, device, description["name"], description["id"])
 
@@ -125,7 +127,7 @@ class DysonSensorEntity(SensorEntity, DysonEntity):
     @property
     def native_value(self):
         """Return the value reported by the sensor."""
-        
+
         if self._id == "temperature": return self._device.temperature
         if self._id == "humidity": return self._device.humidity
         if self._id == "pm25": return self._device.pm25

@@ -1,8 +1,9 @@
 """DataUpdateCoordinator for the Dyson Pure Cool integration."""
 
-import logging
-import async_timeout
 from datetime import timedelta
+import logging
+
+import async_timeout
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -31,7 +32,7 @@ class DysonUpdateCoordinator(DataUpdateCoordinator):
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-        async with async_timeout.timeout(10):  
+        async with async_timeout.timeout(10): 
             try:
                 self._device.request_envionment_data()
             except Exception:

@@ -7,28 +7,22 @@ import logging
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers import config_validation as cv
-from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
-
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
-
-from .dyson import DysonPureCool
-from .coordinator import DysonUpdateCoordinator
-from .exceptions import InvalidAuth, CannotConnect
-
-from .const import (
-    DOMAIN, 
-    CONF_HOST, 
-    CONF_CREDENTIAL, 
-    CONF_DEVICE_TYPE, 
-    CONF_SERIAL
+from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+    DataUpdateCoordinator,
 )
+
+from .const import CONF_CREDENTIAL, CONF_DEVICE_TYPE, CONF_HOST, CONF_SERIAL, DOMAIN
+from .coordinator import DysonUpdateCoordinator
+from .dyson import DysonPureCool
+from .exceptions import CannotConnect, InvalidAuth
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,11 +43,11 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up Dyson Pure Cool from configuration file"""
+    """Set up Dyson Pure Cool from configuration file."""
 
     if DOMAIN not in config:
         return True
-    
+
     hass.async_create_task(
         hass.config_entries.flow.async_init(
             DOMAIN,
@@ -145,7 +139,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 class DysonEntity(CoordinatorEntity, Entity):
     """Representation of a dyson entity."""
-        
+
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool, name: str, id: str):
         super().__init__(coordinator)
 
@@ -164,13 +158,12 @@ class DysonEntity(CoordinatorEntity, Entity):
             "manufacturer": "Dyson",
             "model": self._device.serial
         }
-    
+
 
     async def async_added_to_hass(self) -> None:
         """Finish adding an entity to a platform."""
         self._device.add_update_listener(self._handle_device_update)
-        return
-    
+
 
     @property
     def name(self) -> str:
@@ -184,17 +177,17 @@ class DysonEntity(CoordinatorEntity, Entity):
         """Return a unique ID."""
         if self._id is None: return self._device.serial
         else: return f"{self._device.serial}-{self._id}"
-    
+
 
     @callback
     def _handle_device_update(self, device: DysonPureCool, data: dict) -> None:
-        """Called when state-change mesaage from the device has been received"""
+        """Called when state-change mesaage from the device has been received."""
         self.schedule_update_ha_state()
-        return
+
 
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         self.async_write_ha_state()
-        return
+

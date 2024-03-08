@@ -1,7 +1,6 @@
 """Utility functions for the Dyson Pure Cool integration."""
 
 import time
-from typing import Any
 
 
 def mqtt_time():

@@ -8,36 +8,28 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, OptionsFlow, SOURCE_IMPORT
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.data_entry_flow import FlowResult
-from homeassistant.components.zeroconf import ZeroconfServiceInfo
 from homeassistant.components import zeroconf
-
-from .exceptions import (
-    InvalidAuth, 
-    CannotConnect,
-    DysonCannotConnect,
-    DysonInvalidAuth
-)
+from homeassistant.components.zeroconf import ZeroconfServiceInfo
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import FlowResult
 
 from .const import (
-    DOMAIN, 
-    CONF_HOST, 
-    CONF_CREDENTIAL, 
-    CONF_DEVICE_TYPE, 
+    CONF_CREDENTIAL,
+    CONF_DEVICE_TYPE,
+    CONF_HOST,
     CONF_SERIAL,
-    ZEROCONF_TYPE
+    DOMAIN,
+    ZEROCONF_TYPE,
 )
-
 from .dyson import DysonPureCool
+from .exceptions import CannotConnect, DysonCannotConnect, DysonInvalidAuth, InvalidAuth
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
-    """Validate the user input allows us to connect. """
+    """Validate the user input allows us to connect."""
 
     try:
         if CONF_HOST not in data or len(data[CONF_HOST]) == 0:
@@ -53,7 +45,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
             data[CONF_HOST] = result
 
         device = DysonPureCool(data[CONF_SERIAL], data[CONF_CREDENTIAL], data[CONF_DEVICE_TYPE])
-        
+
         _LOGGER.debug(f"Trying to connect to Dyson Pure Cool ({data[CONF_DEVICE_TYPE]}) {data[CONF_SERIAL]}")
         device.connect(data[CONF_HOST])
 
@@ -77,7 +69,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
 
 def resolve_host(serial: str, device_type: str, zeroconf_instance: zeroconf.HaZeroconf) -> dict[str, str | None]:
-    """Resolving a service with a known name"""
+    """Resolving a service with a known name."""
 
     _LOGGER.debug(f"Trying to get address of Dyson Pure Cool ({device_type}) {serial}")
 
@@ -96,7 +88,7 @@ class DysonConfigFlow(ConfigFlow, domain = DOMAIN):
     """Handle a config flow for Dyson Pure Cool."""
 
     VERSION = 1
-    
+
 
     @staticmethod
     @callback
@@ -142,7 +134,7 @@ class DysonConfigFlow(ConfigFlow, domain = DOMAIN):
             data_schema=vol.Schema(data),
             errors=errors,
         )
-    
+
 
     async def async_step_zeroconf(self, discovery_info: ZeroconfServiceInfo) -> FlowResult:
         """Handle a flow initialized by Zeroconf discovery."""
@@ -168,7 +160,7 @@ class DysonConfigFlow(ConfigFlow, domain = DOMAIN):
         }
 
         return await self.async_step_user()
-    
+
 
     async def async_step_import(self, user_input: dict) -> FlowResult:
         """Handle a flow initialized by import from configuration file."""
@@ -183,7 +175,7 @@ class DysonConfigFlow(ConfigFlow, domain = DOMAIN):
         })
 
         return self.async_create_entry(title=info["title"], data=user_input)
-    
+
 
 
 class DysonOptionsFlowHandler(OptionsFlow):
