@@ -1,9 +1,8 @@
 """DataUpdateCoordinator for the Dyson Pure Cool integration."""
 
+import asyncio
 from datetime import timedelta
 import logging
-
-import async_timeout
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -14,6 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DysonUpdateCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching data from dyson device."""
 
     def __init__(self, hass: HomeAssistant, device: DysonPureCool):
         """Initialize coordinator."""
@@ -32,8 +32,8 @@ class DysonUpdateCoordinator(DataUpdateCoordinator):
         This is the place to pre-process the data to lookup tables
         so entities can quickly look up their data.
         """
-        async with async_timeout.timeout(10): 
+        async with asyncio.timeout(10):
             try:
                 self._device.request_envionment_data()
-            except Exception:
-                raise UpdateFailed("Failed to request environmental data")
+            except ValueError as e:
+                raise UpdateFailed("Failed to request environmental data") from e

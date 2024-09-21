@@ -27,7 +27,7 @@ from .exceptions import CannotConnect, InvalidAuth
 _LOGGER = logging.getLogger(__name__)
 
 
-PLATFORMS: list[Platform] = [Platform.FAN, Platform.SENSOR, Platform.SWITCH]
+PLATFORMS: list[Platform] = [Platform.FAN, Platform.SENSOR, Platform.SWITCH, Platform.NUMBER]
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -70,7 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         device = DysonPureCool(serial, credential, device_type)
 
-        _LOGGER.debug(f"Trying to connect to Dyson Pure Cool ({device_type}) {serial}")
+        _LOGGER.debug("Trying to connect to Dyson Pure Cool (%s) %s", device_type, serial)
         device.connect(host)
 
         hass.config_entries.async_update_entry(
@@ -87,21 +87,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN][f"{entry.entry_id}_coordinator"] = coordinator
 
         await coordinator.async_config_entry_first_refresh()
-
-        for component in PLATFORMS:
-            hass.async_create_task(
-                hass.config_entries.async_forward_entry_setup(entry, component)
-            )
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
         # Register an update listener to the config entry that will be called when the entry is updated.
         entry.async_on_unload(entry.add_update_listener(async_update_listener))
 
     except InvalidAuth:
         _LOGGER.error("Connection refused - bad username or password")
-        raise ConfigEntryNotReady
+        raise ConfigEntryNotReady from None
     except CannotConnect:
         _LOGGER.error("Connection refused")
-        raise ConfigEntryNotReady
+        raise ConfigEntryNotReady from None
 
     return True
 
@@ -141,6 +137,8 @@ class DysonEntity(CoordinatorEntity, Entity):
     """Representation of a dyson entity."""
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool, name: str, id: str):
+        """Initialize a dyson entity."""
+
         super().__init__(coordinator)
 
         self._device = device
@@ -168,22 +166,23 @@ class DysonEntity(CoordinatorEntity, Entity):
     @property
     def name(self) -> str:
         """Return the name of the entity."""
-        if self._name is None: return "Dyson Pure Cool"
-        else: return f"Dyson Pure Cool {self._name}"
+        if self._name is None:
+            return "Dyson Pure Cool"
+        return f"Dyson Pure Cool {self._name}"
 
 
     @property
     def unique_id(self) -> str | None:
         """Return a unique ID."""
-        if self._id is None: return self._device.serial
-        else: return f"{self._device.serial}-{self._id}"
+        if self._id is None:
+            return self._device.serial
+        return f"{self._device.serial}-{self._id}"
 
 
     @callback
     def _handle_device_update(self, device: DysonPureCool, data: dict) -> None:
-        """Called when state-change mesaage from the device has been received."""
+        """Handle a state-change message from the device."""
         self.schedule_update_ha_state()
-
 
 
     @callback

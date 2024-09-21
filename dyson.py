@@ -25,8 +25,11 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DysonPureCool:
+    """Provides functionality to control a dyson fan."""
 
     def __init__(self, serial: str, credential: str,  device_type: str):
+        """Initialize dyson fan with serial, credential and device type."""
+
         self._serial = serial
         self._credential = credential
         self._device_type = device_type
@@ -52,7 +55,7 @@ class DysonPureCool:
 
 
     def connect(self, host: str) -> None:
-        """Connects the client to a broker."""
+        """Connect the client to a broker."""
         self._host = host
 
         self._disconnected.clear()
@@ -65,7 +68,7 @@ class DysonPureCool:
                 self._mqttc.disconnect()
                 raise self._error
 
-            _LOGGER.debug(f"Connected to Dyson Pure Cool ({self._device_type}) {self._serial}")
+            _LOGGER.debug("Connected to Dyson Pure Cool (%s) %s", self._device_type, self._serial)
 
             # Request and wait for first data
             if self._request_first_data():
@@ -82,7 +85,7 @@ class DysonPureCool:
 
 
     def _on_connect(self, client, userdata, flags, rc):
-        """Called when the broker responds to our connection request."""
+        """Called when the broker responds to our connection request."""  # noqa: D401
 
         self._connected.set()
         self._disconnected.clear()
@@ -105,15 +108,15 @@ class DysonPureCool:
 
 
     def _on_disconnect(self, client, userdata, rc):
-        """Called when the client disconnects from the broker."""
+        """Called when the client disconnects from the broker."""  # noqa: D401
 
-        _LOGGER.debug("Disconnected with result code " + str(rc))
+        _LOGGER.debug("Disconnected with result code %s", str(rc))
         self._connected.clear()
         self._disconnected.set()
 
 
     def _on_message(self, client, userdata, msg):
-        """Called when a message has been received on a topic that the client subscribes to."""
+        """Called when a message has been received on a topic that the client subscribes to."""  # noqa: D401
 
         payload = json.loads(msg.payload.decode("utf-8"))
         if payload["msg"] in [DYSON_CURRENT_STATE, DYSON_STATE_CHANGE]:
@@ -130,7 +133,7 @@ class DysonPureCool:
 
 
     def _request_first_data(self) -> bool:
-        """ Request and wait for first data."""
+        """Request and wait for first data."""
 
         self.request_current_state()
         self.request_envionment_data()
@@ -181,10 +184,9 @@ class DysonPureCool:
         if field in self._state_data:
             if isinstance(self._state_data[field], list):
                 return self._state_data[field][1]
-            else: 
-                return self._state_data[field]
+            return self._state_data[field]
 
-        elif field in self._environmental_data:
+        if field in self._environmental_data:
             return self._environmental_data[field]
 
         return None
@@ -212,8 +214,9 @@ class DysonPureCool:
     @property
     def current_direction(self) -> str:
         """Set the direction of the fan."""
-        if self._get_field_value("fdir") == "ON": return DIRECTION_FORWARD
-        else: return DIRECTION_REVERSE
+        if self._get_field_value("fdir") == "ON":
+            return DIRECTION_FORWARD
+        return DIRECTION_REVERSE
 
 
     @property
@@ -226,8 +229,9 @@ class DysonPureCool:
     def speed(self) -> int:
         """Set the speed of the fan."""
         fnsp = self._get_field_value("fnsp")
-        if fnsp == "AUTO": return None
-        else: return int(fnsp)
+        if fnsp == "AUTO":
+            return None
+        return int(fnsp)
 
 
     @property
@@ -255,9 +259,13 @@ class DysonPureCool:
         """Return the current preset mode."""
         auto = self._get_field_value("auto")
         nmod = self._get_field_value("nmod")
-        if auto == "ON" and nmod == "ON": return DYSON_AUTO_NIGHT_MODE
-        elif auto == "ON": return DYSON_AUTO_MODE
-        elif nmod == "ON": return DYSON_NIGHT_MODE
+
+        if auto == "ON" and nmod == "ON":
+            return DYSON_AUTO_NIGHT_MODE
+        if auto == "ON":
+            return DYSON_AUTO_MODE
+        if nmod == "ON":
+            return DYSON_NIGHT_MODE
         return None
 
 
@@ -303,8 +311,10 @@ class DysonPureCool:
         smoke, bacteria and allergens.
         """
         pm25 = self._get_field_value("pm25")
-        try: return int(pm25)
-        except ValueError: return None
+        try:
+            return int(pm25)
+        except ValueError:
+            return None
 
     @property
     def pm10(self) -> int:
@@ -315,8 +325,10 @@ class DysonPureCool:
         include dust, mould and pollen.
         """
         pm10 = self._get_field_value("pm10")
-        try: return int(pm10)
-        except ValueError: return None
+        try:
+            return int(pm10)
+        except ValueError:
+            return None
 
     @property
     def voc(self) -> int:
@@ -327,8 +339,10 @@ class DysonPureCool:
         cleaning products, paints and furnishings.
         """
         va10 = self._get_field_value("va10")
-        try: return int(va10)
-        except ValueError: return None
+        try:
+            return int(va10)
+        except ValueError:
+            return None
 
     @property
     def nox(self) -> int:
@@ -340,8 +354,10 @@ class DysonPureCool:
         exhaust emissions.
         """
         noxl = self._get_field_value("noxl")
-        try: return int(noxl)
-        except ValueError: return None
+        try:
+            return int(noxl)
+        except ValueError:
+            return None
 
     @property
     def carbon_filter_life(self) -> int:
@@ -352,8 +368,10 @@ class DysonPureCool:
         replacing
         """
         cflr = self._get_field_value("cflr")
-        try: return int(cflr)
-        except ValueError: return None
+        try:
+            return int(cflr)
+        except ValueError:
+            return None
 
     @property
     def hepa_filter_life(self) -> int:
@@ -364,8 +382,10 @@ class DysonPureCool:
         replacing
         """
         hflr = self._get_field_value("hflr")
-        try: return int(hflr)
-        except ValueError: return None
+        try:
+            return int(hflr)
+        except ValueError:
+            return None
 
     @property
     def sleep_timer(self) -> int:
@@ -386,17 +406,23 @@ class DysonPureCool:
 
     def set_direction(self, direction: str) -> None:
         """Set the airflow direction of the fan."""
-        if direction == DIRECTION_FORWARD: self._set_configuration(fdir="ON")
-        else: self._set_configuration(fdir="OFF")
+        if direction == DIRECTION_FORWARD:
+            self._set_configuration(fdir="ON")
+        else:
+            self._set_configuration(fdir="OFF")
 
 
     def set_preset_mode(self, preset_mode: str) -> None:
         """Set new preset mode."""
         fpwr = self._get_field_value("fpwr")
-        if preset_mode == DYSON_AUTO_NIGHT_MODE: self._set_configuration(fpwr = "ON", auto="ON", nmod="ON")
-        elif preset_mode == DYSON_AUTO_MODE: self._set_configuration(fpwr = "ON", auto="ON",nmod="OFF")
-        elif preset_mode == DYSON_NIGHT_MODE: self._set_configuration(fpwr = fpwr, auto="OFF", nmod="ON")
-        else: self._set_configuration(fpwr = fpwr, auto="OFF", nmod="OFF")
+        if preset_mode == DYSON_AUTO_NIGHT_MODE:
+            self._set_configuration(fpwr = "ON", auto="ON", nmod="ON")
+        elif preset_mode == DYSON_AUTO_MODE:
+            self._set_configuration(fpwr = "ON", auto="ON",nmod="OFF")
+        elif preset_mode == DYSON_NIGHT_MODE:
+            self._set_configuration(fpwr = fpwr, auto="OFF", nmod="ON")
+        else:
+            self._set_configuration(fpwr = fpwr, auto="OFF", nmod="OFF")
 
 
     def turn_on(self) -> None:
@@ -411,18 +437,22 @@ class DysonPureCool:
 
     def set_speed(self, speed: int) -> None:
         """Set the speed of the fan."""
-        if speed not in range(1, 11): raise ValueError(f"Invalid airflow speed {speed}")
+        if speed not in range(1, 11):
+            raise ValueError(f"Invalid airflow speed {speed}")
         self._set_configuration(fpwr="ON", fnsp=f"{speed:04d}")
 
 
-    def oscillate(self, oscillating: bool, osal: int = None, osau: int = None) -> None:
+    def oscillate(self, oscillating: bool, osal: int | None, osau: int | None) -> None:
         """Oscillate the fan."""
         if oscillating:
 
-            if osal is None: osal = self.oscillate_lower
-            if osau is None: osau = self.oscillate_upper
+            if osal is None:
+                osal = self.oscillate_lower
+            if osau is None:
+                osau = self.oscillate_upper
 
-            if osal > osau: osal, osau = osau, osal
+            if osal > osau:
+                osal, osau = osau, osal
 
             osal = max(osal, 5)
             osau = min(osau, 355)

@@ -115,10 +115,12 @@ class DysonSensorEntity(SensorEntity, DysonEntity):
     """Representation of a dyson sensor entity."""
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool, description: dict[str, Any]):
+        """Initialize a dyson sensor entity."""
         super().__init__(coordinator, device, description["name"], description["id"])
 
         for key, value in description.items():
-            if key in ["name", "id"]: continue
+            if key in ["name", "id"]:
+                continue
 
             name = f"_attr_{key}"
             setattr(self, name, value)
@@ -128,13 +130,22 @@ class DysonSensorEntity(SensorEntity, DysonEntity):
     def native_value(self):
         """Return the value reported by the sensor."""
 
-        if self._id == "temperature": return self._device.temperature
-        if self._id == "humidity": return self._device.humidity
-        if self._id == "pm25": return self._device.pm25
-        if self._id == "pm10": return self._device.pm10
-        if self._id == "va10": return self._device.voc
-        if self._id == "noxl": return self._device.nox
-        if self._id == "hflr": return self._device.hepa_filter_life
-        if self._id == "cflr": return self._device.carbon_filter_life
+        match self._id:
+            case "temperature":
+                return self._device.temperature
+            case "humidity":
+                return self._device.humidity
+            case "pm25":
+                return self._device.pm25
+            case "pm10":
+                return self._device.pm10
+            case "va10":
+                return self._device.voc
+            case "noxl":
+                return self._device.nox
+            case "hflr":
+                return self._device.hepa_filter_life
+            case "cflr":
+                return self._device.carbon_filter_life
 
         return None

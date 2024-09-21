@@ -45,19 +45,18 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
             data[CONF_HOST] = result
 
         device = DysonPureCool(data[CONF_SERIAL], data[CONF_CREDENTIAL], data[CONF_DEVICE_TYPE])
-
-        _LOGGER.debug(f"Trying to connect to Dyson Pure Cool ({data[CONF_DEVICE_TYPE]}) {data[CONF_SERIAL]}")
+        _LOGGER.debug("Trying to connect to Dyson Pure Cool (%s) %s", data[CONF_DEVICE_TYPE], data[CONF_SERIAL])
         device.connect(data[CONF_HOST])
 
     except DysonInvalidAuth as e:
-        _LOGGER.error(str(e)) 
-        raise InvalidAuth 
-    except DysonCannotConnect as e: 
-        _LOGGER.error(str(e)) 
-        raise CannotConnect
+        _LOGGER.error(str(e))
+        raise InvalidAuth from e
+    except DysonCannotConnect as e:
+        _LOGGER.error(str(e))
+        raise CannotConnect from e
     except Exception as e:
         _LOGGER.error(str(e))
-        raise CannotConnect
+        raise CannotConnect from e
 
     return {
         "title": f"Dyson Pure Cool ({data[CONF_SERIAL]})",
@@ -69,18 +68,17 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
 
 def resolve_host(serial: str, device_type: str, zeroconf_instance: zeroconf.HaZeroconf) -> dict[str, str | None]:
-    """Resolving a service with a known name."""
+    """Resolce a service with a known name."""
 
-    _LOGGER.debug(f"Trying to get address of Dyson Pure Cool ({device_type}) {serial}")
+    _LOGGER.debug("Trying to get address of Dyson Pure Cool (%s) %s", device_type, serial)
 
     info = zeroconf_instance.get_service_info(ZEROCONF_TYPE, f"{device_type}_{serial}.{ZEROCONF_TYPE}")
 
-    if not info: 
-        _LOGGER.debug(f"Could not get information about Dyson Pure Cool ({device_type}) {serial}")
+    if not info:
+        _LOGGER.debug("Could not get information about Dyson Pure Cool (%s) %s", device_type, serial)
         return None
 
-    address = socket.inet_ntoa(info.addresses[0])
-    return address
+    return socket.inet_ntoa(info.addresses[0])
 
 
 
@@ -145,7 +143,7 @@ class DysonConfigFlow(ConfigFlow, domain = DOMAIN):
         device_type = name.split("_")[0]
         serial = name.split("_")[1]
 
-        _LOGGER.debug(f"Discovered Dyson Pure Cool ({device_type}) with serial number {serial} at {host}")
+        _LOGGER.debug("Discovered Dyson Pure Cool (%s) with serial number %s at %s", device_type, serial, host)
 
         await self.async_set_unique_id(serial)
         self._abort_if_unique_id_configured(updates={CONF_HOST: host})

@@ -38,14 +38,16 @@ class DysonNightModeSwitchEntity(SwitchEntity, DysonEntity):
 
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool):
+        """Initialize a dyson switch entity."""
         super().__init__(coordinator, device, "Night mode", "nmod")
 
 
     @property
     def icon(self):
         """Return the icon to use in the frontend, if any."""
-        if self._device.preset_mode in [DYSON_NIGHT_MODE, DYSON_AUTO_NIGHT_MODE]: return "mdi:shield-moon"
-        else: return "mdi:shield-moon-outline"
+        if self._device.preset_mode in [DYSON_NIGHT_MODE, DYSON_AUTO_NIGHT_MODE]:
+            return "mdi:shield-moon"
+        return "mdi:shield-moon-outline"
 
 
     @property
@@ -56,11 +58,15 @@ class DysonNightModeSwitchEntity(SwitchEntity, DysonEntity):
 
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the entity on."""
-        if self._device.preset_mode == DYSON_AUTO_MODE: self._device.set_preset_mode(DYSON_AUTO_NIGHT_MODE)
-        else: self._device.set_preset_mode(DYSON_NIGHT_MODE)
+        if self._device.preset_mode == DYSON_AUTO_MODE:
+            self._device.set_preset_mode(DYSON_AUTO_NIGHT_MODE)
+        else:
+            self._device.set_preset_mode(DYSON_NIGHT_MODE)
 
 
     def turn_off(self, **kwargs: Any) -> None:
         """Turn the entity off."""
-        if self._device.preset_mode == DYSON_AUTO_NIGHT_MODE: self._device.set_preset_mode(DYSON_AUTO_MODE)
-        else: self._device.set_preset_mode(None)
+        if self._device.preset_mode == DYSON_AUTO_NIGHT_MODE:
+            self._device.set_preset_mode(DYSON_AUTO_MODE)
+        else:
+            self._device.set_preset_mode(None)

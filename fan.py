@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import logging
 import math
-from typing import Any, Optional
+from typing import Any
 
 import voluptuous as vol
 
@@ -67,6 +67,7 @@ class DysonFanEntity(FanEntity, DysonEntity):
     """Representation of a dyson fan entity."""
 
     def __init__(self, coordinator: DataUpdateCoordinator, device: DysonPureCool):
+        """Initialize a dyson fan entity."""
         super().__init__(coordinator, device, None, None)
 
         self._attr_icon = "mdi:fan"
@@ -93,13 +94,15 @@ class DysonFanEntity(FanEntity, DysonEntity):
     @property
     def percentage(self) -> int:
         """Get the speed percentage of the fan."""
-        if self._device.speed is None: return 0
-        if not self._device.is_on: return 0
+        if self._device.speed is None:
+            return 0
+        if not self._device.is_on:
+            return 0
 
         return ranged_value_to_percentage(SPEED_RANGE, int(self._device.speed))
 
 
-    @property 
+    @property
     def speed_count(self) -> int:
         """The number of speeds the fan supports."""
         return int_states_in_range(SPEED_RANGE)
@@ -108,13 +111,21 @@ class DysonFanEntity(FanEntity, DysonEntity):
     @property
     def supported_features(self) -> int:
         """Flag supported features."""
-        return FanEntityFeature.DIRECTION | FanEntityFeature.OSCILLATE | FanEntityFeature.PRESET_MODE | FanEntityFeature.SET_SPEED
+        return (
+            FanEntityFeature.DIRECTION
+            | FanEntityFeature.OSCILLATE
+            | FanEntityFeature.PRESET_MODE
+            | FanEntityFeature.SET_SPEED
+            | FanEntityFeature.TURN_ON
+            | FanEntityFeature.TURN_OFF
+        )
 
 
     @property
     def preset_mode(self) -> str:
         """Return the current preset_mode.."""
-        if self._device.preset_mode == DYSON_AUTO_MODE: return DYSON_AUTO_MODE
+        if self._device.preset_mode == DYSON_AUTO_MODE:
+            return DYSON_AUTO_MODE
         return None
 
 
@@ -149,17 +160,20 @@ class DysonFanEntity(FanEntity, DysonEntity):
     def set_percentage(self, percentage: int) -> None:
         """Set the speed percentage of the fan."""
 
-        if percentage == 0: self._device.turn_off()
+        if percentage == 0:
+            self._device.turn_off()
         else:
             speed = math.ceil(percentage_to_ranged_value(SPEED_RANGE, percentage))
             self._device.set_speed(speed)
 
 
-    def turn_on(self, speed: Optional[str] = None, percentage: Optional[int] = None, preset_mode: Optional[str] = None, **kwargs: Any) -> None:
+    def turn_on(self, speed: str | None = None, percentage: int | None = None, preset_mode: str | None = None, **kwargs: Any) -> None:
         """Turn on the fan."""
 
-        if preset_mode: self.set_preset_mode(preset_mode)
-        if percentage: self.set_percentage(percentage)
+        if preset_mode:
+            self.set_preset_mode(preset_mode)
+        if percentage:
+            self.set_percentage(percentage)
 
         self._device.turn_on()
 
